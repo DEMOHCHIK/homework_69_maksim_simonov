@@ -1,9 +1,9 @@
 from django.urls import path
 
-from webapp.views import Index
+from webapp.views import index
 
 app_name = 'webapp'
 
 urlpatterns = [
-    path('', Index.as_view(), name='index'),
+    path('', index, name='index'),
 ]

@@ -2,12 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
 </head>
 <body>
 
-<script>
+<h1>Калькулятор:</h1>
+<div style="display: flex">
+    <div>
+        <div style="margin-bottom: 20px">
+            <input type="text" id="inputA" placeholder="Введите Число A"><br><br>
+            <input type="text" id="inputB" placeholder="Введите число B">
+        </div>
+        <div>
+            <a href="{% url 'api_v1:add' %}" class="link_operation">Add</a>
+            <a href="{% url 'api_v1:subtract' %}" class="link_operation">Subtract</a>
+            <a href="{% url 'api_v1:multiply' %}" class="link_operation">Multiply</a>
+            <a href="{% url 'api_v1:divide' %}" class="link_operation">Divide</a>
+        </div>
+    </div>
 
+    <div style="margin-left: 30px;">
+        <h2 style="margin-top: 0">Вывод:</h2>
+        <span id="result" data-result=""></span>
+    </div>
+</div>
+
+<script>
+    async function makeRequest(url, method = 'GET', data) {
+        let response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            let error = new Error(response.statusText);
+            error.response = response;
+            throw error;
+        }
+    }
+
+    async function onClick(e) {
+        e.preventDefault();
+
+        const inputA = document.getElementById('inputA').value;
+        const inputB = document.getElementById('inputB').value;
+
+        let a = e.target;
+        let url = a.getAttribute('href');
+
+        try {
+            let response = await makeRequest(url, 'POST', {A: inputA, B: inputB});
+            let resultElement = document.getElementById('result');
+            resultElement.innerText = `Result: ${response.answer}`;
+            resultElement.style.color = 'green';
+        } catch (error) {
+            console.error('Error:', error);
+
+            let resultElement = document.getElementById('result');
+            resultElement.innerText = `Error: ${error.response ? error.response.statusText : 'Unknown error'}`;
+            resultElement.style.color = 'red';
+        }
+    }
+
+    function onLoad() {
+        let operations = document.getElementsByClassName('link_operation');
+        for (let i = 0; i < operations.length; i++) {
+            operations[i].addEventListener('click', onClick);
+        }
+    }
+
+    window.addEventListener('load', onLoad);
 </script>
 </body>
 </html>
