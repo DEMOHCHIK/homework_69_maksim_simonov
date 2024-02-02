@@ -8,4 +8,5 @@ urls_app = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(urls_app)),
+    path('', include('webapp.urls')),
 ]
